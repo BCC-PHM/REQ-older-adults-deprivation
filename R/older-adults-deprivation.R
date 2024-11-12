@@ -28,7 +28,7 @@ Brum_IDAOPI <- read.csv("../data/imd2019lsoa.csv") %>%
   select(LSOA11, IDAOPI, Brum_IDAOPI_rank, Brum_IDAOPI_rank_perc)
 
 # Plot map
-map <- plot_map(
+IDAOPI_map <- plot_map(
   Brum_IDAOPI,
   "Brum_IDAOPI_rank_perc",
   "LSOA11",
@@ -40,10 +40,10 @@ map <- plot_map(
 )
 
 # Show map
-map
+IDAOPI_map
 
 # Save map
-save_map(map, "../output/Birmingham-IDAOPI.png")
+save_map(IDAOPI_map, "../output/Birmingham-IDAOPI.png")
 
 ############################################################
 #           Metric = IDAOPI * (65+ Population)             #
@@ -96,3 +96,33 @@ metric_map
 
 # Save map
 save_map(metric_map, "../output/Birmingham-IDAOPI-metric.png")
+
+############################################################
+#                     GP locations                         #
+############################################################
+
+GP_locations <- readxl::read_excel(
+  "../data/2024-07-15 Practice_Main+Branch_Site.xlsx"
+  ) %>%
+  mutate(
+    `GP Practice` = prac_name,
+    Postcode = postcode
+  ) %>%
+  select(`GP Practice`, Postcode)
+
+# Add GP locations to scaled IDAOPI map
+IDAOPI_map_GP <- add_points(IDAOPI_map,
+                            GP_locations,
+                            shape = "GP Practice",
+                            size = 0.05)
+
+save_map(IDAOPI_map_GP, "../output/Birmingham-IDAOPI-GP.html")
+
+# Add GP locations to scaled IDAOPI metric map
+
+metric_map_GP <- add_points(metric_map,
+           GP_locations,
+           shape = "GP Practice",
+           size = 0.05)
+
+save_map(metric_map_GP, "../output/Birmingham-IDAOPI-metric-GP.html")
